@@ -9,9 +9,10 @@ WilczaJagoda::WilczaJagoda(int x, int y, Swiat *swiat)
 WilczaJagoda::~WilczaJagoda() {}
 
 void WilczaJagoda::kolizja(Organizm *przeciwnik) {
-    swiat->dodajLog("Zwierzę " + przeciwnik->rysowanie() + " na pozycji (" +
+    swiat->dodajLog(przeciwnik->rysowanie() + " na pozycji (" +
                     to_string(przeciwnik->getX()) + ", " + to_string(przeciwnik->getY()) +
-                    ") zjada Wilcze Jagody (" + rysowanie() + ") i kończy swój żywot.");
+                    ") zjadł " + rysowanie() + " z pozycji (" + to_string(x) + ", " + to_string(y) +
+                    ") i umiera.");
     przeciwnik->zabij();
     this->zabij();
 }

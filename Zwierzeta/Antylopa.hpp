@@ -8,6 +8,7 @@ public:
 
     virtual void akcja() override;
     virtual void kolizja(Organizm *przeciwnik) override;
+    virtual Zwierze *stworzPotomka(int x, int y) override;
 
 private:
     void ucieczkaPrzedWalka();

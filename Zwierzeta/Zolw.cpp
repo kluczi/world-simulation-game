@@ -12,19 +12,27 @@ Zolw::~Zolw() {}
 void Zolw::akcja() {
     int liczba = rand() % 4;
     if (liczba != 0) {
-        cout << "Zolw pozostaje na swoim miejscu." << endl;
+        swiat->dodajLog("🐢 na pozycji (" + to_string(x) + ", " + to_string(y) +
+                        ") pozostaje na swoim miejscu.");
         return;
     }
 
-    cout << "Zolw wykonuje ruch." << endl;
     Zwierze::akcja();
 }
 
 void Zolw::kolizja(Organizm *przeciwnik) {
     if (przeciwnik->getSila() < 5) {
-        cout << "Zolw odpiera atak organizmu o sile " << przeciwnik->getSila() << "." << endl;
-        przeciwnik->setPozycja(przeciwnik->getX(), przeciwnik->getY());
-    } else {
-        Zwierze::kolizja(przeciwnik);
+        // Log informujący o odbiciu ataku
+        swiat->dodajLog("🐢 na pozycji (" + to_string(x) + ", " + to_string(y) +
+                        ") odpiera atak " + przeciwnik->rysowanie() +
+                        " o sile " + to_string(przeciwnik->getSila()) + ".");
+        return; // Zakończ kolizję, ponieważ Żółw odbił atak
     }
+
+    // Jeśli siła przeciwnika jest większa lub równa 5, wykonaj standardową logikę kolizji
+    Zwierze::kolizja(przeciwnik);
+}
+
+Zwierze *Zolw::stworzPotomka(int x, int y) {
+    return new Zolw(x, y, swiat);
 }

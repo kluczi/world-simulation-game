@@ -1,4 +1,5 @@
 #include "Zwierze.hpp"
+#include "../Rosliny/Roslina.hpp"
 #include "../Swiat.hpp"
 #include <cstdlib>
 #include <iostream>
@@ -19,9 +20,13 @@ void Zwierze::akcja() {
 
     Organizm *przeciwnik = swiat->znajdzOrganizm(nowyX, nowyY);
     if (przeciwnik) {
-        kolizja(przeciwnik);
+        przeciwnik->kolizja(this);
+
+        if (dynamic_cast<Roslina *>(przeciwnik) && przeciwnik->czyMartwy()) {
+            setPozycja(nowyX, nowyY);
+        }
     } else {
-        swiat->dodajLog("Zwierzę " + rysowanie() + " przemieszcza się z (" +
+        swiat->dodajLog(rysowanie() + " przemieszcza się z (" +
                         to_string(x) + ", " + to_string(y) + ") na (" +
                         to_string(nowyX) + ", " + to_string(nowyY) + ").");
         setPozycja(nowyX, nowyY);
@@ -29,14 +34,17 @@ void Zwierze::akcja() {
 }
 
 void Zwierze::kolizja(Organizm *przeciwnik) {
-    if (typeid(*this) == typeid(*przeciwnik)) {
+    if (dynamic_cast<Roslina *>(przeciwnik)) {
+        przeciwnik->kolizja(this);
+    } else if (typeid(*this) == typeid(*przeciwnik)) {
+        // Logika rozmnażania
         int nowyX, nowyY;
         bool znalezionoPole = false;
 
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
                 if (dx == 0 && dy == 0)
-                    continue; // Pomijamy pole, na którym stoi organizm
+                    continue;
                 nowyX = x + dx;
                 nowyY = y + dy;
 
@@ -51,35 +59,37 @@ void Zwierze::kolizja(Organizm *przeciwnik) {
         }
 
         if (!znalezionoPole) {
-            return; // Brak wolnego miejsca, kończymy metodę bez logowania
+            swiat->dodajLog(rysowanie() + " nie może się rozmnożyć, brak wolnego miejsca.");
+            return;
         }
 
         Zwierze *potomek = stworzPotomka(nowyX, nowyY);
-        if (potomek) { // Sprawdzenie, czy pamięć została poprawnie przydzielona
-            swiat->dodajOrganizm(potomek);
-            swiat->dodajLog("Zwierzę " + rysowanie() + " rozmnaża się z " +
-                            przeciwnik->rysowanie() + " na pozycji (" +
-                            to_string(nowyX) + ", " + to_string(nowyY) + ").");
+        if (potomek) {
+            swiat->dodajOrganizm(potomek); // Dodanie potomka do świata
+            swiat->dodajLog(rysowanie() + " z pola (" + to_string(x) + ", " + to_string(y) +
+                            ") rozmnaża się z " + przeciwnik->rysowanie() + " z pola (" +
+                            to_string(przeciwnik->getX()) + ", " + to_string(przeciwnik->getY()) +
+                            "), potomek pojawia się na polu (" + to_string(nowyX) + ", " + to_string(nowyY) + ").");
         }
     } else {
-        // Walka, jeśli organizmy są różne
+        // Walka
         if (sila > przeciwnik->getSila()) {
-            swiat->dodajLog("Zwierzę " + rysowanie() + " wygrywa walkę z " +
-                            przeciwnik->rysowanie() + " na pozycji (" +
-                            to_string(przeciwnik->getX()) + ", " +
-                            to_string(przeciwnik->getY()) + ").");
+            swiat->dodajLog(rysowanie() + " na pozycji (" + to_string(x) + ", " + to_string(y) +
+                            ") wygrywa walkę z " + przeciwnik->rysowanie() + " na pozycji (" +
+                            to_string(przeciwnik->getX()) + ", " + to_string(przeciwnik->getY()) + ").");
             przeciwnik->zabij();
+            setPozycja(przeciwnik->getX(), przeciwnik->getY()); // Przejdź na pole przeciwnika
         } else if (sila < przeciwnik->getSila()) {
-            swiat->dodajLog("Zwierzę " + przeciwnik->rysowanie() + " wygrywa walkę z " +
-                            rysowanie() + " na pozycji (" + to_string(x) + ", " +
-                            to_string(y) + ").");
+            swiat->dodajLog(przeciwnik->rysowanie() + " na pozycji (" + to_string(przeciwnik->getX()) +
+                            ", " + to_string(przeciwnik->getY()) + ") wygrywa walkę z " +
+                            rysowanie() + " na pozycji (" + to_string(x) + ", " + to_string(y) + ").");
             zabij();
         } else {
-            swiat->dodajLog("Zwierzę " + rysowanie() + " remisuje z " +
-                            przeciwnik->rysowanie() + " na pozycji (" +
-                            to_string(przeciwnik->getX()) + ", " +
-                            to_string(przeciwnik->getY()) + "). Atakujący wygrywa.");
+            swiat->dodajLog(rysowanie() + " na pozycji (" + to_string(x) + ", " + to_string(y) +
+                            ") remisuje z " + przeciwnik->rysowanie() + " na pozycji (" +
+                            to_string(przeciwnik->getX()) + ", " + to_string(przeciwnik->getY()) + "). Atakujący wygrywa.");
             przeciwnik->zabij();
+            setPozycja(przeciwnik->getX(), przeciwnik->getY()); // Przejdź na pole przeciwnika
         }
     }
 }

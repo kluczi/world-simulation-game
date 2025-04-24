@@ -10,16 +10,11 @@ Guarana::Guarana(int x, int y, Swiat *swiat)
 Guarana::~Guarana() {}
 
 void Guarana::kolizja(Organizm *przeciwnik) {
-    // Zwiększenie siły przeciwnika
     przeciwnik->setSila(przeciwnik->getSila() + 3);
-
-    // Dodanie logu o zjedzeniu Guarany
-    swiat->dodajLog("Organizm " + przeciwnik->rysowanie() + " na pozycji (" +
+    swiat->dodajLog(przeciwnik->rysowanie() + " na pozycji (" +
                     to_string(przeciwnik->getX()) + ", " + to_string(przeciwnik->getY()) +
-                    ") zjadł Guaranę (" + rysowanie() + ") i zyskał 3 siły. Nowa siła: " +
-                    to_string(przeciwnik->getSila()) + ".");
-
-    // Oznaczenie Guarany jako martwej
+                    ") zjadł " + rysowanie() + " z pozycji (" + to_string(x) + ", " + to_string(y) +
+                    ") i zyskał 3 siły. Nowa siła: " + to_string(przeciwnik->getSila()) + ".");
     this->zabij();
 }
 

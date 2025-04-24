@@ -3,12 +3,12 @@
 #include "Zwierzeta/Czlowiek.hpp"
 #include <algorithm>
 #include <cstdlib>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <vector>
 using namespace std;
 
-// Definicja domyślnego konstruktora
 Swiat::Swiat() : szerokosc(20), wysokosc(20), numerTury(1) {}
 
 Swiat::Swiat(int szerokosc, int wysokosc)
@@ -24,30 +24,46 @@ Swiat::~Swiat() {
 void Swiat::pobierzRuchCzlowieka() {
     for (Organizm *organizm : organizmy) {
         if (Czlowiek *czlowiek = dynamic_cast<Czlowiek *>(organizm)) {
-            czlowiek->akcja(); // Wywołaj akcję człowieka (ruch strzałkami)
+            czlowiek->akcja();
             return;
         }
     }
 }
 
 void Swiat::wykonajTure() {
-    // Sortowanie organizmów
     sortujOrganizmy();
 
-    // Kopia wektora organizmów do iteracji
+    // Zmniejsz czas trwania superumiejętności Człowieka
+    for (Organizm *organizm : organizmy) {
+        if (Czlowiek *czlowiek = dynamic_cast<Czlowiek *>(organizm)) {
+            if (czlowiek->czyUmiejetnoscAktywna()) {
+                czlowiek->zmniejszPozostaleTuryUmiejetnosci();
+                if (czlowiek->getPozostaleTuryUmiejetnosci() == 0) {
+                    czlowiek->dezaktywujUmiejetnosc();
+                    dodajLog("Superumiejętność człowieka wygasła. Będzie dostępna za 5 tur.");
+                }
+            } else if (czlowiek->getPozostaleTuryDoAktywacji() > 0) {
+                czlowiek->zmniejszPozostaleTuryDoAktywacji();
+                if (czlowiek->getPozostaleTuryDoAktywacji() == 0) {
+                    dodajLog("Superumiejętność człowieka jest ponownie gotowa do użycia!");
+                }
+            }
+        }
+    }
+
     std::vector<Organizm *> organizmyDoIteracji = organizmy;
 
-    // Przetwarzanie organizmów
     for (Organizm *organizm : organizmyDoIteracji) {
         if (organizm && !organizm->czyMartwy()) {
             przetworzOrganizm(organizm);
         }
     }
 
-    // Usunięcie martwych organizmów
     usunMartweOrganizmy();
 
-    // Czyszczenie logów i przejście do następnej tury
+    // Wyświetl stan organizmów po zakończeniu tury
+    rysujStanSwiata();
+
     numerTury++;
 }
 
@@ -61,15 +77,21 @@ void Swiat::sortujOrganizmy() {
 }
 
 void Swiat::przetworzOrganizm(Organizm *organizm) {
-    if (dynamic_cast<Czlowiek *>(organizm) != nullptr) {
-        return;
+    if (organizm->czyMartwy()) {
+        return; // Nie przetwarzaj martwego organizmu
     }
 
     organizm->akcja();
 
+    if (organizm->czyMartwy()) {
+        return; // Jeśli organizm zginął podczas akcji, zakończ przetwarzanie
+    }
+
     Organizm *przeciwnik = znajdzOrganizm(organizm->getX(), organizm->getY());
     if (przeciwnik && przeciwnik != organizm) {
-        organizm->kolizja(przeciwnik);
+        if (!przeciwnik->czyMartwy() && !organizm->czyMartwy()) {
+            organizm->kolizja(przeciwnik);
+        }
     }
 
     organizm->zwiekszWiek();
@@ -78,8 +100,8 @@ void Swiat::przetworzOrganizm(Organizm *organizm) {
 void Swiat::usunMartweOrganizmy() {
     for (auto it = organizmy.begin(); it != organizmy.end();) {
         if ((*it)->czyMartwy()) {
-            delete *it;               // Usuwanie organizmu z pamięci
-            it = organizmy.erase(it); // Usuwanie wskaźnika z wektora
+            delete *it;               // Usuń obiekt z pamięci
+            it = organizmy.erase(it); // Usuń wskaźnik z listy
         } else {
             ++it;
         }
@@ -97,18 +119,14 @@ void Swiat::wyswietlLogi() const {
 }
 
 void Swiat::rysujStanSwiata() const {
-    // Czyszczenie konsoli
     system("clear");
 
-    // Nagłówek
     cout << "--------------------------------------------------------------" << endl;
     cout << "Bartosz Kluska, s203185" << endl;
     cout << "Tura nr: " << numerTury << endl;
 
-    // Oddzielenie sekcji
     cout << "--------------------------------------------------------------" << endl;
 
-    // Informacje o superumiejętności człowieka
     for (const Organizm *organizm : organizmy) {
         if (const Czlowiek *czlowiek = dynamic_cast<const Czlowiek *>(organizm)) {
             if (czlowiek->czyUmiejetnoscAktywna()) {
@@ -123,26 +141,19 @@ void Swiat::rysujStanSwiata() const {
         }
     }
 
-    // Oddzielenie sekcji
     cout << "--------------------------------------------------------------" << endl;
 
-    // Plansza
     rysujSwiat();
 
-    // Oddzielenie sekcji
     cout << "--------------------------------------------------------------" << endl;
 
-    // Logi
     cout << "Zdarzenia na mapie podczas tury:" << endl;
     wyswietlLogi();
 
-    // Czyszczenie logów po ich wyświetleniu
     const_cast<std::vector<std::string> &>(logi).clear();
 
-    // Oddzielenie sekcji
     cout << "--------------------------------------------------------------" << endl;
 
-    // Stan organizmów
     cout << "Stan organizmów na mapie:" << endl;
     for (const Organizm *organizm : organizmy) {
         cout << organizm->rysowanie() << " na pozycji (" << organizm->getX() << ", " << organizm->getY()
@@ -201,3 +212,84 @@ void Swiat::wyswietlStanOrganizmow() const {
 int Swiat::getNumerTury() const {
     return numerTury;
 }
+int Swiat::getSzerokosc() const {
+    return szerokosc;
+}
+
+int Swiat::getWysokosc() const {
+    return wysokosc;
+}
+// void Swiat::zapiszDoPliku(const std::string &nazwaPliku) const {
+//     std::ofstream plik(nazwaPliku);
+//     if (!plik.is_open()) {
+//         std::cerr << "Nie można otworzyć pliku do zapisu: " << nazwaPliku << std::endl;
+//         return;
+//     }
+
+//     // Zapisz rozmiar świata i numer tury
+//     plik << szerokosc << " " << wysokosc << " " << numerTury << std::endl;
+
+//     // Zapisz organizmy
+//     for (const Organizm *organizm : organizmy) {
+//         plik << typeid(*organizm).name() << " "   // Typ organizmu
+//              << organizm->getX() << " "           // Pozycja X
+//              << organizm->getY() << " "           // Pozycja Y
+//              << organizm->getSila() << " "        // Siła
+//              << organizm->getWiek() << std::endl; // Wiek
+//     }
+
+//     plik.close();
+//     std::cout << "Stan świata zapisano do pliku: " << nazwaPliku << std::endl;
+// }
+
+// void Swiat::wczytajZPliku(const std::string &nazwaPliku) {
+//     std::ifstream plik(nazwaPliku);
+//     if (!plik.is_open()) {
+//         std::cerr << "Nie można otworzyć pliku do odczytu: " << nazwaPliku << std::endl;
+//         return;
+//     }
+
+//     // Usuń istniejące organizmy
+//     for (Organizm *organizm : organizmy) {
+//         delete organizm;
+//     }
+//     organizmy.clear();
+
+//     // Wczytaj rozmiar świata i numer tury
+//     plik >> szerokosc >> wysokosc >> numerTury;
+
+//     // Wczytaj organizmy
+//     std::string typ;
+//     int x, y, sila, wiek;
+//     while (plik >> typ >> x >> y >> sila >> wiek) {
+//         Organizm *nowyOrganizm = nullptr;
+
+//         // Tworzenie odpowiedniego organizmu na podstawie typu
+//         if (typ == typeid(Lis).name()) {
+//             nowyOrganizm = new Lis(x, y, this);
+//         } else if (typ == typeid(Wilk).name()) {
+//             nowyOrganizm = new Wilk(x, y, this);
+//         } else if (typ == typeid(Owca).name()) {
+//             nowyOrganizm = new Owca(x, y, this);
+//         } else if (typ == typeid(Zolw).name()) {
+//             nowyOrganizm = new Zolw(x, y, this);
+//         } else if (typ == typeid(BarszczSosnowskiego).name()) {
+//             nowyOrganizm = new BarszczSosnowskiego(x, y, this);
+//         } else if (typ == typeid(Guarana).name()) {
+//             nowyOrganizm = new Guarana(x, y, this);
+//         } else if (typ == typeid(Trawa).name()) {
+//             nowyOrganizm = new Trawa(x, y, this);
+//         } else if (typ == typeid(WilczaJagoda).name()) {
+//             nowyOrganizm = new WilczaJagoda(x, y, this);
+//         }
+
+//         if (nowyOrganizm) {
+//             nowyOrganizm->setSila(sila);
+//             nowyOrganizm->zwiekszWiek(); // Ustaw wiek
+//             dodajOrganizm(nowyOrganizm);
+//         }
+//     }
+
+//     plik.close();
+//     std::cout << "Stan świata wczytano z pliku: " << nazwaPliku << std::endl;
+// }

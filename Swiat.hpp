@@ -35,4 +35,9 @@ public:
     void wyswietlStanOrganizmow() const;
 
     int getNumerTury() const;
+    int getSzerokosc() const;
+    int getWysokosc() const;
+    // // Nowe metody
+    // void zapiszDoPliku(const std::string &nazwaPliku) const;
+    // void wczytajZPliku(const std::string &nazwaPliku);
 };

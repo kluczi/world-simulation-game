@@ -12,7 +12,7 @@ protected:
     std::string ikona;
     int wiek;
     bool martwy;
-    int ostatnieRozmnazanie; // Tura, w której organizm ostatnio się rozmnażał
+    int ostatnieRozmnazanie;
 
 public:
     Organizm(int sila, int inicjatywa, int x, int y, Swiat *swiat, const std::string &ikona);

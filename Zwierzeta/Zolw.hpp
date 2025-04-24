@@ -7,5 +7,6 @@ public:
     virtual ~Zolw();
 
     virtual void akcja() override;
+    virtual Zwierze *stworzPotomka(int x, int y) override;
     virtual void kolizja(Organizm *przeciwnik) override;
 };

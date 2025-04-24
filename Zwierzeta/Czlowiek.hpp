@@ -17,9 +17,12 @@ public:
     virtual void kolizja(Organizm *przeciwnik) override;
     virtual Zwierze *stworzPotomka(int x, int y) override;
     void aktywujUmiejetnosc();
+    void dezaktywujUmiejetnosc();
 
-    // Gettery
+    // Gettery i metody pomocnicze
     bool czyUmiejetnoscAktywna() const;
     int getPozostaleTuryUmiejetnosci() const;
     int getPozostaleTuryDoAktywacji() const;
+    void zmniejszPozostaleTuryUmiejetnosci();
+    void zmniejszPozostaleTuryDoAktywacji();
 };

@@ -4,7 +4,7 @@
 
 class Zwierze : public Organizm {
 public:
-    Zwierze(int sila, int inicjatywa, int x, int y, Swiat *swiat, const std::string &ikona); // Zmieniono typ ikony na std::string
+    Zwierze(int sila, int inicjatywa, int x, int y, Swiat *swiat, const std::string &ikona);
     virtual ~Zwierze();
 
     virtual void akcja() override;
