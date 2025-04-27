@@ -1,5 +1,6 @@
-#include "Rosliny/BarszczSosnowskiego.hpp" // Dodano Barszcz Sosnowskiego
+#include "Rosliny/BarszczSosnowskiego.hpp"
 #include "Rosliny/Guarana.hpp"
+#include "Rosliny/Mlecz.hpp"
 #include "Rosliny/Trawa.hpp"
 #include "Rosliny/WilczaJagoda.hpp"
 #include "Swiat.hpp"
@@ -19,21 +20,63 @@ using namespace std;
 int main() {
     srand(time(NULL));
 
-    Swiat swiat(5, 5); // Zwiększono rozmiar świata dla testu
-    // swiat.dodajOrganizm(new Wilk(1, 1, &swiat)); // Zmieniono Wilka na Owcę
-    // swiat.dodajOrganizm(new Czlowiek(3, 1, &swiat));
-    swiat.dodajOrganizm(new Antylopa(2, 2, &swiat));
-    swiat.dodajOrganizm(new Wilk(1, 3, &swiat));
-    // swiat.dodajOrganizm(new Lis(3, 2, &swiat));
-    // swiat.dodajOrganizm(new Lis(4, 2, &swiat));
+    Swiat swiat(20, 20);
+    new Guarana(15, 16, &swiat);
+    new Mlecz(12, 12, &swiat);
+    new Trawa(5, 12, &swiat);
+    new BarszczSosnowskiego(19, 19, &swiat);
+    new WilczaJagoda(1, 20, &swiat);
+    new Antylopa(16, 11, &swiat);
+    new Lis(20, 3, &swiat);
+    new Owca(9, 9, &swiat);
+    new Owca(10, 9, &swiat);
+    new Wilk(1, 1, &swiat);
+    new Zolw(3, 7, &swiat);
+    new Czlowiek(0, 0, &swiat);
+    swiat.rysujStanSwiata();
+    string nazwaPliku;
+
     while (true) {
-        swiat.rysujStanSwiata();
+        cout << "Naciśnij Enter, aby rozpocząć nową turę..." << endl;
+        bool czyTura = true;
+        while (czyTura) {
 
-        swiat.pobierzRuchCzlowieka();
-
-        swiat.wykonajTure();
-        cout << "Naciśnij Enter, aby kontynuować..." << endl;
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            char wejscie = swiat.pobierzWejscie();
+            switch (wejscie) {
+            case 'u':
+                for (Organizm *organizm : swiat.getOrganizmy()) {
+                    if (Czlowiek *czlowiek = dynamic_cast<Czlowiek *>(organizm)) {
+                        if (czlowiek->getPozostaleTuryDoAktywacji() > 0) {
+                            cout << "Umiejętność ma cooldown: " << czlowiek->getPozostaleTuryDoAktywacji() << " tur." << "\n";
+                        } else if (czlowiek->czyUmiejetnoscAktywna()) {
+                            cout << "Umiejętność już aktywna. Pozostało: " << czlowiek->getPozostaleTuryUmiejetnosci() << " tur." << "\n";
+                        } else {
+                            czlowiek->aktywujUmiejetnosc();
+                            cout << "Umiejętność włączona!" << "\n";
+                        }
+                        break;
+                    }
+                }
+                break;
+            case 'z':
+                cout << "Podaj nazwę pliku do zapisu (bez rozszerzenia): ";
+                cin >> nazwaPliku;
+                swiat.zapiszDoPliku(nazwaPliku + ".txt");
+                return 0;
+            case 'w': {
+                cout << "Podaj nazwę pliku do wczytania (bez rozszerzenia): ";
+                cin >> nazwaPliku;
+                swiat.wczytajZPliku(nazwaPliku + ".txt");
+                swiat.rysujStanSwiata();
+                czyTura = false;
+                break;
+            }
+            case '\n':
+                swiat.wykonajTure();
+                czyTura = false;
+                break;
+            }
+        }
     }
 
     return 0;

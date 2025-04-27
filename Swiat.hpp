@@ -4,14 +4,15 @@
 #include <iostream>
 #include <string>
 #include <vector>
+using namespace std;
 
 class Swiat {
 private:
     int szerokosc;
     int wysokosc;
     int numerTury;
-    std::vector<Organizm *> organizmy;
-    std::vector<std::string> logi;
+    vector<Organizm *> organizmy;
+    vector<string> logi;
 
     void sortujOrganizmy();
     void przetworzOrganizm(Organizm *organizm);
@@ -21,7 +22,7 @@ public:
     Swiat();
     Swiat(int szerokosc, int wysokosc);
     ~Swiat();
-
+    char pobierzWejscie();
     void dodajOrganizm(Organizm *organizm);
     Organizm *znajdzOrganizm(int x, int y) const;
     bool czyPoleJestNaPlanszy(int x, int y) const;
@@ -30,14 +31,14 @@ public:
     void rysujSwiat() const;
     void rysujStanSwiata() const;
 
-    void dodajLog(const std::string &log);
+    void dodajLog(const string &log);
     void wyswietlLogi() const;
     void wyswietlStanOrganizmow() const;
-
+    void wyczyscLogi();
     int getNumerTury() const;
     int getSzerokosc() const;
     int getWysokosc() const;
-    // // Nowe metody
-    // void zapiszDoPliku(const std::string &nazwaPliku) const;
-    // void wczytajZPliku(const std::string &nazwaPliku);
+    void zapiszDoPliku(const string &nazwaPliku) const;
+    void wczytajZPliku(const string &nazwaPliku);
+    const vector<Organizm *> &getOrganizmy() const;
 };

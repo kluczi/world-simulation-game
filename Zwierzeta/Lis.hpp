@@ -1,5 +1,6 @@
 #pragma once
 #include "Zwierze.hpp"
+using namespace std;
 
 class Lis : public Zwierze {
 public:

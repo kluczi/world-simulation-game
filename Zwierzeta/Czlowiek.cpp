@@ -11,38 +11,13 @@ Czlowiek::Czlowiek(int x, int y, Swiat *swiat)
 
 Czlowiek::~Czlowiek() {}
 
-char Czlowiek::pobierzWejscie() {
-    struct termios oldt, newt;
-    char ch;
-    tcgetattr(STDIN_FILENO, &oldt);
-    newt = oldt;
-    newt.c_lflag &= ~(ICANON | ECHO);
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-    ch = getchar();
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-    return ch;
-}
-
 void Czlowiek::akcja() {
 
-    if (umiejetnoscAktywna) {
-        pozostaleTuryUmiejetnosci--;
-        if (pozostaleTuryUmiejetnosci == 0) {
-            umiejetnoscAktywna = false;
-            pozostaleTuryDoAktywacji = 5;
-            swiat->dodajLog("Superumiejętność człowieka wygasła. Będzie dostępna za 5 tur.");
-        }
-    } else if (pozostaleTuryDoAktywacji > 0) {
-        pozostaleTuryDoAktywacji--;
-        if (pozostaleTuryDoAktywacji == 0) {
-            swiat->dodajLog("Superumiejętność człowieka jest ponownie gotowa do użycia!");
-        }
-    }
-
-    char ruch = pobierzWejscie();
-    if (ruch == '\033') {
-        pobierzWejscie();
-        ruch = pobierzWejscie();
+    cout << "Podaj ruch za pomocą strzałki: ";
+    char ruch = swiat->pobierzWejscie();
+    if (ruch == 27) {
+        swiat->pobierzWejscie();
+        ruch = swiat->pobierzWejscie();
     }
 
     if (ruch == 'U' || ruch == 'u') {
@@ -53,35 +28,68 @@ void Czlowiek::akcja() {
     int nowyX = x, nowyY = y;
     if (ruch == 'A') {
         nowyY--;
-        swiat->dodajLog("🧍 wybrał ruch: Góra");
+        // swiat->dodajLog("🧍 wybrał ruch: Góra");
     } else if (ruch == 'B') {
         nowyY++;
-        swiat->dodajLog("🧍 wybrał ruch: Dół");
+        // swiat->dodajLog("🧍 wybrał ruch: Dół");
     } else if (ruch == 'D') {
         nowyX--;
-        swiat->dodajLog("🧍 wybrał ruch: Lewo");
+        // swiat->dodajLog("🧍 wybrał ruch: Lewo");
     } else if (ruch == 'C') {
         nowyX++;
-        swiat->dodajLog("🧍 wybrał ruch: Prawo");
-    } else {
-        swiat->dodajLog("🧍 nie wybrał poprawnego ruchu.");
-        return;
+        // swiat->dodajLog("🧍 wybrał ruch: Prawo");
     }
 
     if (swiat->czyPoleJestNaPlanszy(nowyX, nowyY)) {
         Organizm *przeciwnik = swiat->znajdzOrganizm(nowyX, nowyY);
         if (przeciwnik) {
-            przeciwnik->kolizja(this);
+            if (umiejetnoscAktywna && przeciwnik->getSila() > this->getSila()) {
+                swiat->dodajLog("🧍 próbuje przemieścić się na pole (" + to_string(nowyX) + ", " + to_string(nowyY) +
+                                ") zajmowane przez " + przeciwnik->rysowanie() +
+                                ", lecz jest nieśmiertelny i unika walki!");
 
-            if (dynamic_cast<Roslina *>(przeciwnik) && przeciwnik->czyMartwy()) {
-                setPozycja(nowyX, nowyY);
+                int wolneX = x, wolneY = y;
+                bool znalezionoWolnePole = false;
+
+                for (int proba = 0; proba < 10; proba++) {
+                    int tmpX, tmpY;
+                    losujSasiedniePole(tmpX, tmpY);
+
+                    if (swiat->czyPoleJestNaPlanszy(tmpX, tmpY) &&
+                        swiat->znajdzOrganizm(tmpX, tmpY) == nullptr) {
+                        wolneX = tmpX;
+                        wolneY = tmpY;
+                        znalezionoWolnePole = true;
+                        break;
+                    }
+                }
+
+                if (znalezionoWolnePole) {
+                    swiat->dodajLog("🧍 używa superumiejętności i unika walki, przenosząc się na pole (" +
+                                    to_string(wolneX) + ", " + to_string(wolneY) + ").");
+                    setPozycja(wolneX, wolneY);
+                } else {
+                    swiat->dodajLog("🧍 nie znalazł wolnego pola do ucieczki mimo superumiejętności.");
+                }
+            } else {
+                if (this->getSila() >= przeciwnik->getSila()) {
+                    swiat->dodajLog("🧍 atakuje " + przeciwnik->rysowanie() +
+                                    " na pozycji (" + to_string(nowyX) + ", " + to_string(nowyY) + ").");
+                    przeciwnik->zabij();
+                    setPozycja(nowyX, nowyY);
+                } else {
+                    swiat->dodajLog("🧍 atakuje silniejszego " + przeciwnik->rysowanie() +
+                                    " na pozycji (" + to_string(nowyX) + ", " + to_string(nowyY) + ") i przegrywa.");
+                    this->zabij();
+                }
             }
         } else {
-            swiat->dodajLog("🧍 przemieszcza się na pole (" + to_string(nowyX) + ", " + to_string(nowyY) + ").");
+            swiat->dodajLog(rysowanie() + " przemieszcza się z pola (" + to_string(x) + ", " + to_string(y) +
+                            ") na pole (" + to_string(nowyX) + ", " + to_string(nowyY) + ").");
             setPozycja(nowyX, nowyY);
         }
     } else {
-        swiat->dodajLog("🧍 próbuje wyjść poza planszę!");
+        swiat->dodajLog(rysowanie() + " próbuje wyjść poza planszę!");
     }
 }
 
@@ -90,39 +98,35 @@ void Czlowiek::kolizja(Organizm *przeciwnik) {
         return;
     }
 
-    if (umiejetnoscAktywna) {
+    if (umiejetnoscAktywna && przeciwnik->getSila() > this->getSila()) {
         swiat->dodajLog("🧍 na pozycji (" + to_string(x) + ", " + to_string(y) +
                         ") został zaatakowany przez " + przeciwnik->rysowanie() +
                         " na pozycji (" + to_string(przeciwnik->getX()) + ", " + to_string(przeciwnik->getY()) + ").");
+        swiat->dodajLog("🧍 unika walki dzięki superumiejętności i przesuwa się na losowe sąsiednie pole.");
 
-        if (przeciwnik->getSila() > this->getSila()) {
-            swiat->dodajLog("🧍 unika walki dzięki superumiejętności i przesuwa się na losowe sąsiednie pole.");
-            int nowyX, nowyY;
-            bool znalezionoWolnePole = false;
+        int nowyX, nowyY;
+        bool znalezionoWolnePole = false;
 
-            for (int i = 0; i < 8; i++) {
-                losujSasiedniePole(nowyX, nowyY);
-                if (swiat->czyPoleJestNaPlanszy(nowyX, nowyY) && swiat->znajdzOrganizm(nowyX, nowyY) == nullptr) {
-                    znalezionoWolnePole = true;
-                    break;
-                }
+        for (int i = 0; i < 20; i++) {
+            losujSasiedniePole(nowyX, nowyY);
+            if (swiat->czyPoleJestNaPlanszy(nowyX, nowyY) && swiat->znajdzOrganizm(nowyX, nowyY) == nullptr) {
+                znalezionoWolnePole = true;
+                break;
             }
-
-            if (znalezionoWolnePole) {
-                setPozycja(nowyX, nowyY);
-                swiat->dodajLog("🧍 przesunął się na pole (" + to_string(nowyX) + ", " + to_string(nowyY) + ").");
-            } else {
-                swiat->dodajLog("🧍 nie znalazł wolnego pola do ucieczki i pozostaje na miejscu.");
-            }
-        } else {
-
-            swiat->dodajLog("🧍 dzięki superumiejętności podejmuje walkę z " +
-                            przeciwnik->rysowanie() + " i wygrywa.");
-            przeciwnik->zabij();
         }
-    } else {
-        Zwierze::kolizja(przeciwnik);
+
+        if (znalezionoWolnePole) {
+            setPozycja(nowyX, nowyY);
+            swiat->dodajLog("🧍 przesunął się na pole (" + to_string(nowyX) + ", " + to_string(nowyY) + ").");
+            return;
+        } else {
+            swiat->dodajLog("🧍 nie znalazł wolnego pola do ucieczki, zostaje pokonany!");
+            zabij();
+            return;
+        }
     }
+
+    Zwierze::kolizja(przeciwnik);
 }
 
 void Czlowiek::aktywujUmiejetnosc() {
@@ -158,7 +162,6 @@ void Czlowiek::zmniejszPozostaleTuryDoAktywacji() {
 }
 
 Zwierze *Czlowiek::stworzPotomka(int x, int y) {
-    cout << "Czlowiek nie może tworzyć potomków!" << endl;
     return nullptr;
 }
 

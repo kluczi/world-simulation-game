@@ -2,10 +2,12 @@
 #include "Swiat.hpp"
 #include <cstdlib>
 #include <ctime>
-
-Organizm::Organizm(int sila, int inicjatywa, int x, int y, Swiat *swiat, const std::string &ikona)
+using namespace std;
+Organizm::Organizm(int sila, int inicjatywa, int x, int y, Swiat *swiat, const string &ikona)
     : sila(sila), inicjatywa(inicjatywa), x(x), y(y), swiat(swiat), ikona(ikona),
-      wiek(0), martwy(false), ostatnieRozmnazanie(-1) {}
+      wiek(0), martwy(false), ostatnieRozmnazanie(-1) {
+    swiat->dodajOrganizm(this);
+}
 
 Organizm::~Organizm() {}
 
@@ -32,7 +34,7 @@ Swiat *Organizm::getSwiat() const {
     return swiat;
 }
 
-std::string Organizm::rysowanie() const {
+string Organizm::rysowanie() const {
     return ikona;
 }
 
@@ -58,4 +60,11 @@ void Organizm::zabij() {
 
 bool Organizm::czyMartwy() const {
     return martwy;
+}
+
+int Organizm::getOstatnieRozmnazanie() const {
+    return ostatnieRozmnazanie;
+}
+void Organizm::setOstatnieRozmnazanie(int tura) {
+    ostatnieRozmnazanie = tura;
 }

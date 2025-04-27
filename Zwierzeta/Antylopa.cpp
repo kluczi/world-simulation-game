@@ -13,28 +13,26 @@ void Antylopa::akcja() {
     int nowyX, nowyY;
     bool znalezionoPole = false;
 
-    // Próbuj znaleźć poprawne pole do ruchu
-    for (int i = 0; i < 10; i++) { // Maksymalnie 10 prób
+    for (int i = 0; i < 10; i++) {
         nowyX = getX();
         nowyY = getY();
 
         int kierunek = rand() % 4;
         switch (kierunek) {
-        case 0: // Góra
+        case 0:
             nowyY = getY() - 2;
             break;
-        case 1: // Dół
+        case 1:
             nowyY = getY() + 2;
             break;
-        case 2: // Lewo
+        case 2:
             nowyX = getX() - 2;
             break;
-        case 3: // Prawo
+        case 3:
             nowyX = getX() + 2;
             break;
         }
 
-        // Sprawdź, czy nowe pole jest w granicach planszy
         if (swiat->czyPoleJestNaPlanszy(nowyX, nowyY)) {
             znalezionoPole = true;
             break;
@@ -42,28 +40,27 @@ void Antylopa::akcja() {
     }
 
     if (znalezionoPole) {
-        // Dodaj log o ruchu Antylopy
-        swiat->dodajLog("🐐 Antylopa z pola (" + to_string(getX()) + ", " + to_string(getY()) +
+
+        swiat->dodajLog("🐐 z pola (" + to_string(getX()) + ", " + to_string(getY()) +
                         ") przemieszcza się na pole (" + to_string(nowyX) + ", " + to_string(nowyY) + ").");
         setPozycja(nowyX, nowyY);
     } else {
-        // Jeśli nie znaleziono pola, Antylopa pozostaje na miejscu
-        swiat->dodajLog("🐐 Antylopa z pola (" + to_string(getX()) + ", " + to_string(getY()) +
+
+        swiat->dodajLog("🐐 z pola (" + to_string(getX()) + ", " + to_string(getY()) +
                         ") nie znalazła odpowiedniego pola do ruchu i pozostaje na miejscu.");
     }
 }
 
 void Antylopa::kolizja(Organizm *przeciwnik) {
-    int szansa = rand() % 2; // 50% szans na ucieczkę
+    int szansa = rand() % 2;
     if (szansa == 0) {
-        // Antylopa ucieka przed walką
         int stareX = getX();
         int stareY = getY();
         int noweX = stareX;
         int noweY = stareY;
 
         bool znalezionoPole = false;
-        for (int i = 0; i < 8; i++) { // Maksymalnie 8 prób (dla sąsiednich pól)
+        for (int i = 0; i < 8; i++) {
             losujSasiedniePole(noweX, noweY);
             if (swiat->czyPoleJestNaPlanszy(noweX, noweY) && swiat->znajdzOrganizm(noweX, noweY) == nullptr) {
                 znalezionoPole = true;
@@ -73,12 +70,12 @@ void Antylopa::kolizja(Organizm *przeciwnik) {
 
         if (znalezionoPole) {
             setPozycja(noweX, noweY);
-            swiat->dodajLog("🐐 Antylopa ucieka z pola (" + to_string(stareX) + ", " + to_string(stareY) +
+            swiat->dodajLog("🐐 ucieka z pola (" + to_string(stareX) + ", " + to_string(stareY) +
                             ") przed walką z " + przeciwnik->rysowanie() + " z pola (" +
                             to_string(przeciwnik->getX()) + ", " + to_string(przeciwnik->getY()) +
                             ") na pole (" + to_string(noweX) + ", " + to_string(noweY) + ").");
         } else {
-            swiat->dodajLog("🐐 Antylopa próbuje uciec z pola (" + to_string(stareX) + ", " + to_string(stareY) +
+            swiat->dodajLog("🐐 próbuje uciec z pola (" + to_string(stareX) + ", " + to_string(stareY) +
                             ") przed walką z " + przeciwnik->rysowanie() + " z pola (" +
                             to_string(przeciwnik->getX()) + ", " + to_string(przeciwnik->getY()) +
                             "), ale nie znalazła wolnego pola i pozostaje na miejscu.");
@@ -86,8 +83,7 @@ void Antylopa::kolizja(Organizm *przeciwnik) {
         return;
     }
 
-    // Antylopa walczy
-    swiat->dodajLog("🐐 Antylopa z pola (" + to_string(getX()) + ", " + to_string(getY()) +
+    swiat->dodajLog("🐐 z pola (" + to_string(getX()) + ", " + to_string(getY()) +
                     ") walczy z " + przeciwnik->rysowanie() +
                     " z pola (" + to_string(przeciwnik->getX()) + ", " + to_string(przeciwnik->getY()) + ").");
     Zwierze::kolizja(przeciwnik);
@@ -111,9 +107,9 @@ void Antylopa::przesunNaNiezajetePole() {
     }
 
     if (znalezionoPole) {
-        swiat->dodajLog("🐐 Antylopa ucieka na pole (" + to_string(noweX) + ", " + to_string(noweY) + ").");
+        swiat->dodajLog("🐐 ucieka na pole (" + to_string(noweX) + ", " + to_string(noweY) + ").");
         setPozycja(noweX, noweY);
     } else {
-        swiat->dodajLog("🐐 Antylopa próbuje uciec, ale nie znalazła wolnego pola i pozostaje na miejscu.");
+        swiat->dodajLog("🐐 próbuje uciec, ale nie znalazła wolnego pola i pozostaje na miejscu.");
     }
 }

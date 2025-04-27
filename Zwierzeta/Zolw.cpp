@@ -13,7 +13,7 @@ void Zolw::akcja() {
     int liczba = rand() % 4;
     if (liczba != 0) {
         swiat->dodajLog("🐢 na pozycji (" + to_string(x) + ", " + to_string(y) +
-                        ") pozostaje na swoim miejscu.");
+                        ") nie ma zamiaru się ruszyć i pozostaje na swoim miejscu.");
         return;
     }
 
@@ -22,14 +22,12 @@ void Zolw::akcja() {
 
 void Zolw::kolizja(Organizm *przeciwnik) {
     if (przeciwnik->getSila() < 5) {
-        // Log informujący o odbiciu ataku
         swiat->dodajLog("🐢 na pozycji (" + to_string(x) + ", " + to_string(y) +
-                        ") odpiera atak " + przeciwnik->rysowanie() +
-                        " o sile " + to_string(przeciwnik->getSila()) + ".");
-        return; // Zakończ kolizję, ponieważ Żółw odbił atak
+                        ") odbija atak " + przeciwnik->rysowanie() +
+                        " o sile " + to_string(przeciwnik->getSila()) + " swoją skorupą.");
+        return;
     }
 
-    // Jeśli siła przeciwnika jest większa lub równa 5, wykonaj standardową logikę kolizji
     Zwierze::kolizja(przeciwnik);
 }
 

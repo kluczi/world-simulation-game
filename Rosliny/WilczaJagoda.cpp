@@ -17,6 +17,6 @@ void WilczaJagoda::kolizja(Organizm *przeciwnik) {
     this->zabij();
 }
 
-WilczaJagoda *WilczaJagoda::stworzRosline(int x, int y) {
-    return new WilczaJagoda(x, y, swiat);
+WilczaJagoda *WilczaJagoda::stworzRosline(int nowyX, int nowyY) {
+    return new WilczaJagoda(nowyX, nowyY, swiat);
 }

@@ -18,6 +18,6 @@ void Guarana::kolizja(Organizm *przeciwnik) {
     this->zabij();
 }
 
-Guarana *Guarana::stworzRosline(int x, int y) {
-    return new Guarana(x, y, swiat);
+Guarana *Guarana::stworzRosline(int nowyX, int nowyY) {
+    return new Guarana(nowyX, nowyY, swiat);
 }

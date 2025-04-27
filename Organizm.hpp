@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-
+using namespace std;
 class Swiat;
 
 class Organizm {
@@ -9,13 +9,13 @@ protected:
     int inicjatywa;
     int x, y;
     Swiat *swiat;
-    std::string ikona;
+    string ikona;
     int wiek;
     bool martwy;
     int ostatnieRozmnazanie;
 
 public:
-    Organizm(int sila, int inicjatywa, int x, int y, Swiat *swiat, const std::string &ikona);
+    Organizm(int sila, int inicjatywa, int x, int y, Swiat *swiat, const string &ikona);
     virtual ~Organizm();
 
     int getSila() const;
@@ -31,7 +31,7 @@ public:
     virtual void akcja() = 0;
     virtual void kolizja(Organizm *przeciwnik) = 0;
 
-    virtual std::string rysowanie() const;
+    virtual string rysowanie() const;
 
     void losujSasiedniePole(int &x, int &y) const;
 
@@ -41,6 +41,6 @@ public:
     int getWiek() const;
     void zwiekszWiek();
 
-    int getOstatnieRozmnazanie() const { return ostatnieRozmnazanie; }
-    void setOstatnieRozmnazanie(int tura) { ostatnieRozmnazanie = tura; }
+    int getOstatnieRozmnazanie() const;
+    void setOstatnieRozmnazanie(int tura);
 };

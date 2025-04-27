@@ -7,7 +7,7 @@
 
 using namespace std;
 
-Zwierze::Zwierze(int sila, int inicjatywa, int x, int y, Swiat *swiat, const std::string &ikona)
+Zwierze::Zwierze(int sila, int inicjatywa, int x, int y, Swiat *swiat, const string &ikona)
     : Organizm(sila, inicjatywa, x, y, swiat, ikona) {}
 
 Zwierze::~Zwierze() {}
@@ -23,12 +23,13 @@ void Zwierze::akcja() {
         przeciwnik->kolizja(this);
 
         if (dynamic_cast<Roslina *>(przeciwnik) && przeciwnik->czyMartwy()) {
+            swiat->dodajLog(rysowanie() + " przemieszcza się z pola (" + to_string(x) + ", " + to_string(y) +
+                            ") na pole (" + to_string(nowyX) + ", " + to_string(nowyY) + ").");
             setPozycja(nowyX, nowyY);
         }
     } else {
-        swiat->dodajLog(rysowanie() + " przemieszcza się z (" +
-                        to_string(x) + ", " + to_string(y) + ") na (" +
-                        to_string(nowyX) + ", " + to_string(nowyY) + ").");
+        swiat->dodajLog(rysowanie() + " przemieszcza się z pola (" + to_string(x) + ", " + to_string(y) +
+                        ") na pole (" + to_string(nowyX) + ", " + to_string(nowyY) + ").");
         setPozycja(nowyX, nowyY);
     }
 }
@@ -37,7 +38,11 @@ void Zwierze::kolizja(Organizm *przeciwnik) {
     if (dynamic_cast<Roslina *>(przeciwnik)) {
         przeciwnik->kolizja(this);
     } else if (typeid(*this) == typeid(*przeciwnik)) {
-        // Logika rozmnażania
+        if (this->getOstatnieRozmnazanie() == swiat->getNumerTury() ||
+            przeciwnik->getOstatnieRozmnazanie() == swiat->getNumerTury()) {
+            return;
+        }
+
         int nowyX, nowyY;
         bool znalezionoPole = false;
 
@@ -65,20 +70,22 @@ void Zwierze::kolizja(Organizm *przeciwnik) {
 
         Zwierze *potomek = stworzPotomka(nowyX, nowyY);
         if (potomek) {
-            swiat->dodajOrganizm(potomek); // Dodanie potomka do świata
+            // swiat->dodajOrganizm(potomek);
             swiat->dodajLog(rysowanie() + " z pola (" + to_string(x) + ", " + to_string(y) +
                             ") rozmnaża się z " + przeciwnik->rysowanie() + " z pola (" +
                             to_string(przeciwnik->getX()) + ", " + to_string(przeciwnik->getY()) +
-                            "), potomek pojawia się na polu (" + to_string(nowyX) + ", " + to_string(nowyY) + ").");
+                            "), potomek rodzi się na polu (" + to_string(nowyX) + ", " + to_string(nowyY) + ").");
+
+            this->setOstatnieRozmnazanie(swiat->getNumerTury());
+            przeciwnik->setOstatnieRozmnazanie(swiat->getNumerTury());
         }
     } else {
-        // Walka
+
         if (sila > przeciwnik->getSila()) {
             swiat->dodajLog(rysowanie() + " na pozycji (" + to_string(x) + ", " + to_string(y) +
                             ") wygrywa walkę z " + przeciwnik->rysowanie() + " na pozycji (" +
                             to_string(przeciwnik->getX()) + ", " + to_string(przeciwnik->getY()) + ").");
             przeciwnik->zabij();
-            setPozycja(przeciwnik->getX(), przeciwnik->getY()); // Przejdź na pole przeciwnika
         } else if (sila < przeciwnik->getSila()) {
             swiat->dodajLog(przeciwnik->rysowanie() + " na pozycji (" + to_string(przeciwnik->getX()) +
                             ", " + to_string(przeciwnik->getY()) + ") wygrywa walkę z " +
@@ -86,10 +93,9 @@ void Zwierze::kolizja(Organizm *przeciwnik) {
             zabij();
         } else {
             swiat->dodajLog(rysowanie() + " na pozycji (" + to_string(x) + ", " + to_string(y) +
-                            ") remisuje z " + przeciwnik->rysowanie() + " na pozycji (" +
-                            to_string(przeciwnik->getX()) + ", " + to_string(przeciwnik->getY()) + "). Atakujący wygrywa.");
+                            ") toczy równą walkę z " + przeciwnik->rysowanie() + " na pozycji (" +
+                            to_string(przeciwnik->getX()) + ", " + to_string(przeciwnik->getY()) + "). Atakujący zaskakuje i wygrywa.");
             przeciwnik->zabij();
-            setPozycja(przeciwnik->getX(), przeciwnik->getY()); // Przejdź na pole przeciwnika
         }
     }
 }

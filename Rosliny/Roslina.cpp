@@ -5,7 +5,7 @@
 
 using namespace std;
 
-Roslina::Roslina(int sila, int x, int y, Swiat *swiat, const std::string &ikona)
+Roslina::Roslina(int sila, int x, int y, Swiat *swiat, const string &ikona)
     : Organizm(sila, 0, x, y, swiat, ikona) {}
 
 Roslina::~Roslina() {}
@@ -21,34 +21,61 @@ void Roslina::kolizja(Organizm *przeciwnik) {
 }
 
 void Roslina::rozprzestrzenianie() {
-    int nowyX, nowyY;
-    bool znalezionoPole = false;
+    int wolnePola = 0;
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dy = -1; dy <= 1; dy++) {
+            if (dx == 0 && dy == 0)
+                continue;
+
+            int tmpX = x + dx;
+            int tmpY = y + dy;
+
+            if (swiat->czyPoleJestNaPlanszy(tmpX, tmpY) &&
+                swiat->znajdzOrganizm(tmpX, tmpY) == nullptr) {
+                wolnePola++;
+            }
+        }
+    }
+
+    if (wolnePola == 0) {
+        return;
+    }
+
+    int losowePole = rand() % wolnePola;
+
+    int licznik = 0;
+    int nowyX = -1;
+    int nowyY = -1;
 
     for (int dx = -1; dx <= 1; dx++) {
         for (int dy = -1; dy <= 1; dy++) {
             if (dx == 0 && dy == 0)
-                continue; // Pomijamy pole, na którym stoi roślina
-            nowyX = x + dx;
-            nowyY = y + dy;
+                continue;
 
-            if (swiat->czyPoleJestNaPlanszy(nowyX, nowyY) &&
-                swiat->znajdzOrganizm(nowyX, nowyY) == nullptr) {
-                znalezionoPole = true;
-                break;
+            int tmpX = x + dx;
+            int tmpY = y + dy;
+
+            if (swiat->czyPoleJestNaPlanszy(tmpX, tmpY) &&
+                swiat->znajdzOrganizm(tmpX, tmpY) == nullptr) {
+                if (licznik == losowePole) {
+                    nowyX = tmpX;
+                    nowyY = tmpY;
+                    break;
+                }
+                licznik++;
             }
         }
-        if (znalezionoPole)
+        if (nowyX != -1) {
             break;
+        }
     }
 
-    if (!znalezionoPole) {
-        return; // Brak wolnego miejsca, kończymy metodę bez logowania
-    }
-
-    Roslina *nowaRoslina = stworzRosline(nowyX, nowyY);
-    if (nowaRoslina) { // Sprawdzenie, czy pamięć została poprawnie przydzielona
-        swiat->dodajOrganizm(nowaRoslina);
-        swiat->dodajLog("Roślina " + rysowanie() + " rozprzestrzenia się na pole (" +
-                        to_string(nowyX) + ", " + to_string(nowyY) + ").");
+    if (nowyX != -1 && nowyY != -1 && swiat->znajdzOrganizm(nowyX, nowyY) == nullptr) {
+        Roslina *nowaRoslina = stworzRosline(nowyX, nowyY);
+        if (nowaRoslina) {
+            // swiat->dodajOrganizm(nowaRoslina);
+            swiat->dodajLog(rysowanie() + " rozprzestrzenia się na pole (" +
+                            to_string(nowyX) + ", " + to_string(nowyY) + ").");
+        }
     }
 }

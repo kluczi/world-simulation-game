@@ -14,7 +14,7 @@ void BarszczSosnowskiego::akcja() {
     for (int dx = -1; dx <= 1; dx++) {
         for (int dy = -1; dy <= 1; dy++) {
             if (dx == 0 && dy == 0)
-                continue; // Pomijamy pole, na którym stoi Barszcz Sosnowskiego
+                continue;
 
             int nowyX = x + dx;
             int nowyY = y + dy;
@@ -22,7 +22,6 @@ void BarszczSosnowskiego::akcja() {
             if (swiat->czyPoleJestNaPlanszy(nowyX, nowyY)) {
                 Organizm *organizm = swiat->znajdzOrganizm(nowyX, nowyY);
 
-                // Sprawdź, czy organizm jest zwierzęciem
                 if (organizm && dynamic_cast<Zwierze *>(organizm) != nullptr) {
                     swiat->dodajLog("🌿 na pozycji (" + to_string(x) + ", " + to_string(y) +
                                     ") zabija " + organizm->rysowanie() +
@@ -39,10 +38,10 @@ void BarszczSosnowskiego::kolizja(Organizm *przeciwnik) {
                     to_string(przeciwnik->getX()) + ", " + to_string(przeciwnik->getY()) +
                     ") zjadł 🌿 z pozycji (" + to_string(x) + ", " + to_string(y) +
                     ") i umiera.");
-    przeciwnik->zabij(); // Zwierzę umiera po zjedzeniu Barszczu
-    this->zabij();       // Barszcz również zostaje zniszczony
+    przeciwnik->zabij();
+    this->zabij();
 }
 
-BarszczSosnowskiego *BarszczSosnowskiego::stworzRosline(int x, int y) {
-    return new BarszczSosnowskiego(x, y, swiat);
+BarszczSosnowskiego *BarszczSosnowskiego::stworzRosline(int nowyX, int nowyY) {
+    return new BarszczSosnowskiego(nowyX, nowyY, swiat);
 }

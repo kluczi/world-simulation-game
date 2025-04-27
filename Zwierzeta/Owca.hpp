@@ -1,6 +1,6 @@
 #pragma once
 #include "Zwierze.hpp"
-
+using namespace std;
 class Owca : public Zwierze {
 public:
     Owca(int x, int y, Swiat *swiat);
