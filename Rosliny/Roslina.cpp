@@ -18,6 +18,7 @@ void Roslina::akcja() {
 }
 
 void Roslina::kolizja(Organizm *przeciwnik) {
+    this->zabij();
 }
 
 void Roslina::rozprzestrzenianie() {

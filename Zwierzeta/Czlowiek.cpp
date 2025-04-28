@@ -26,18 +26,29 @@ void Czlowiek::akcja() {
     }
 
     int nowyX = x, nowyY = y;
+    bool czyPoruszylSie = false;
+
     if (ruch == 'A') {
         nowyY--;
+        czyPoruszylSie = true;
         // swiat->dodajLog("🧍 wybrał ruch: Góra");
     } else if (ruch == 'B') {
         nowyY++;
+        czyPoruszylSie = true;
         // swiat->dodajLog("🧍 wybrał ruch: Dół");
     } else if (ruch == 'D') {
         nowyX--;
+        czyPoruszylSie = true;
         // swiat->dodajLog("🧍 wybrał ruch: Lewo");
     } else if (ruch == 'C') {
         nowyX++;
+        czyPoruszylSie = true;
         // swiat->dodajLog("🧍 wybrał ruch: Prawo");
+    }
+
+    if (!czyPoruszylSie) {
+        swiat->dodajLog("🧍 na pozycji (" + to_string(x) + ", " + to_string(y) + ") pozostaje w miejscu.");
+        return;
     }
 
     if (swiat->czyPoleJestNaPlanszy(nowyX, nowyY)) {
