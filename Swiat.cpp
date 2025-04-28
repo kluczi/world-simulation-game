@@ -135,6 +135,11 @@ void Swiat::rysujStanSwiata() const {
 
     cout << "--------------------------------------------------------------" << endl;
     cout << "Bartosz Kluska, s203185" << endl;
+    cout << "--------------------------------------------------------------" << endl;
+    cout << "Opis gry:" << endl;
+    cout << "Zwierzęta: 🧍 - Człowiek 🐺 - Wilk 🐑 - Owca 🦊 - Lis 🐐 - Antylopa 🐢 - Żółw" << endl;
+    cout << "Rośliny: 🌱 - Trawa 🌼 - Mlecz 🌺 - Guarana 🍄 - Wilcza Jagoda 🌿 - Barszcz Sosnowskiego" << endl;
+    cout << "Sterowanie: U - Umiejętność specjalna Z - Zapisz grę W - Wczytaj grę Enter - Nowa tura" << endl;
     cout << "Tura nr: " << numerTury << endl;
 
     cout << "--------------------------------------------------------------" << endl;
@@ -252,33 +257,34 @@ void Swiat::zapiszDoPliku(const string &nazwaPliku) const {
 
     for (const Organizm *organizm : organizmy) {
         string typ;
-        if (dynamic_cast<const Lis *>(organizm))
+        if (dynamic_cast<const Lis *>(organizm)) {
             typ = "Lis";
-        else if (dynamic_cast<const Wilk *>(organizm))
+        } else if (dynamic_cast<const Wilk *>(organizm)) {
             typ = "Wilk";
-        else if (dynamic_cast<const Owca *>(organizm))
+        } else if (dynamic_cast<const Owca *>(organizm)) {
             typ = "Owca";
-        else if (dynamic_cast<const Zolw *>(organizm))
+        } else if (dynamic_cast<const Zolw *>(organizm)) {
             typ = "Zolw";
-        else if (dynamic_cast<const BarszczSosnowskiego *>(organizm))
+        } else if (dynamic_cast<const BarszczSosnowskiego *>(organizm)) {
             typ = "BarszczSosnowskiego";
-        else if (dynamic_cast<const Guarana *>(organizm))
+        } else if (dynamic_cast<const Guarana *>(organizm)) {
             typ = "Guarana";
-        else if (dynamic_cast<const Trawa *>(organizm))
+        } else if (dynamic_cast<const Trawa *>(organizm)) {
             typ = "Trawa";
-        else if (dynamic_cast<const WilczaJagoda *>(organizm))
+        } else if (dynamic_cast<const WilczaJagoda *>(organizm)) {
             typ = "WilczaJagoda";
-        else if (dynamic_cast<const Antylopa *>(organizm))
+        } else if (dynamic_cast<const Antylopa *>(organizm)) {
             typ = "Antylopa";
-        else if (dynamic_cast<const Czlowiek *>(organizm))
+        } else if (dynamic_cast<const Czlowiek *>(organizm)) {
             typ = "Czlowiek";
+        }
 
         plik << typ << " " << organizm->getX() << " " << organizm->getY() << " "
              << organizm->getSila() << " " << organizm->getWiek() << endl;
     }
 
     plik.close();
-    cout << "Stan świata zapisano do pliku: " << nazwaPliku << endl;
+    cout << "Stan świata został zapisany." << endl;
 }
 
 void Swiat::wczytajZPliku(const string &nazwaPliku) {
@@ -311,26 +317,27 @@ void Swiat::wczytajZPliku(const string &nazwaPliku) {
     while (plik >> typ >> x >> y >> sila >> wiek) {
         Organizm *nowyOrganizm = nullptr;
 
-        if (typ == "Lis")
+        if (typ == "Lis") {
             nowyOrganizm = new Lis(x, y, this);
-        else if (typ == "Wilk")
+        } else if (typ == "Wilk") {
             nowyOrganizm = new Wilk(x, y, this);
-        else if (typ == "Owca")
+        } else if (typ == "Owca") {
             nowyOrganizm = new Owca(x, y, this);
-        else if (typ == "Zolw")
+        } else if (typ == "Zolw") {
             nowyOrganizm = new Zolw(x, y, this);
-        else if (typ == "BarszczSosnowskiego")
+        } else if (typ == "BarszczSosnowskiego") {
             nowyOrganizm = new BarszczSosnowskiego(x, y, this);
-        else if (typ == "Guarana")
+        } else if (typ == "Guarana") {
             nowyOrganizm = new Guarana(x, y, this);
-        else if (typ == "Trawa")
+        } else if (typ == "Trawa") {
             nowyOrganizm = new Trawa(x, y, this);
-        else if (typ == "WilczaJagoda")
+        } else if (typ == "WilczaJagoda") {
             nowyOrganizm = new WilczaJagoda(x, y, this);
-        else if (typ == "Antylopa")
+        } else if (typ == "Antylopa") {
             nowyOrganizm = new Antylopa(x, y, this);
-        else if (typ == "Czlowiek")
+        } else if (typ == "Czlowiek") {
             nowyOrganizm = new Czlowiek(x, y, this);
+        }
 
         if (nowyOrganizm) {
             nowyOrganizm->setSila(sila);
@@ -342,5 +349,5 @@ void Swiat::wczytajZPliku(const string &nazwaPliku) {
     }
 
     plik.close();
-    cout << "Stan świata wczytano z pliku: " << nazwaPliku << endl;
+    cout << "Stan świata został wczytany z " << nazwaPliku << endl;
 }

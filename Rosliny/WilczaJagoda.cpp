@@ -4,7 +4,7 @@
 using namespace std;
 
 WilczaJagoda::WilczaJagoda(int x, int y, Swiat *swiat)
-    : Roslina(99, x, y, swiat, "🫐") {}
+    : Roslina(99, x, y, swiat, "🍄") {}
 
 WilczaJagoda::~WilczaJagoda() {}
 

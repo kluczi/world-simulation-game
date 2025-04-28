@@ -19,20 +19,25 @@ using namespace std;
 
 int main() {
     srand(time(NULL));
-
+    // test całego świata
     Swiat swiat(20, 20);
     new Guarana(15, 16, &swiat);
     new Mlecz(12, 12, &swiat);
     new Trawa(5, 12, &swiat);
     new BarszczSosnowskiego(19, 19, &swiat);
-    new WilczaJagoda(1, 20, &swiat);
+    new WilczaJagoda(5, 17, &swiat);
     new Antylopa(16, 11, &swiat);
-    new Lis(20, 3, &swiat);
+    new Lis(16, 3, &swiat);
     new Owca(9, 9, &swiat);
     new Owca(10, 9, &swiat);
     new Wilk(1, 1, &swiat);
     new Zolw(3, 7, &swiat);
     new Czlowiek(0, 0, &swiat);
+
+    // Swiat swiat(3, 3);
+    // new Wilk(1, 1, &swiat);
+    // new Owca(1, 2, &swiat);
+
     swiat.rysujStanSwiata();
     string nazwaPliku;
 
