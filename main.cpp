@@ -34,10 +34,11 @@ int main() {
     new Zolw(3, 7, &swiat);
     new Czlowiek(0, 0, &swiat);
 
-    // Swiat swiat(3, 3);
-    // new Wilk(1, 1, &swiat);
-    // new Owca(1, 2, &swiat);
-
+    // Swiat swiat(5, 5);
+    new Lis(1, 9, &swiat);
+    new Lis(1, 2, &swiat);
+    new Lis(3, 6, &swiat);
+    new Lis(3, 2, &swiat);
     swiat.rysujStanSwiata();
     string nazwaPliku;
 
