@@ -1,4 +1,0 @@
-5 5 3
-Wilk 1 2 9 3
-Czlowiek 4 0 5 3
-Antylopa 2 4 4 3
