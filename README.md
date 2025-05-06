@@ -18,14 +18,14 @@ A turn-based world simulation game where players control a human character and i
 
 ```bash
 # 1. Clone repository
-git clone [https://github.com/kluczi/snake.git](https://github.com/kluczi/world-simulation-game.git)
+git clone https://github.com/kluczi/world-simulation-game.git
 
 # 2. Change directory to the project
 cd world-simulation-game
 
 # 3. Build and run
 g++ -o main main.cpp
-
+./main
 ```
 
 # License
